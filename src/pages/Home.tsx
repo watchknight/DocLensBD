@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Sparkles, ArrowRight, Star, ShieldCheck } from 'lucide-react';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
+import VirtualTryOn from '../components/VirtualTryOn';
 import { products, frameShapes } from '../data/products';
 
 const Home: React.FC = () => {
   const bestSellers = products.filter(p => p.isBestSeller);
   const newArrivals = products.filter(p => p.isNew);
+  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
 
   return (
     <div>
@@ -69,9 +71,9 @@ const Home: React.FC = () => {
               <p className="text-white/70 text-lg mb-6">
                 Use your camera to see how frames look on your face. Our advanced AR technology gives you a realistic preview from the comfort of your home.
               </p>
-              <Link to="/products" className="inline-flex items-center gap-2 bg-[#00BAC6] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#00a8b3] transition-all shadow-lg">
+              <button onClick={() => setIsTryOnOpen(true)} className="inline-flex items-center gap-2 bg-[#00BAC6] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#00a8b3] transition-all shadow-lg">
                 <Eye size={20} /> Try On Now
-              </Link>
+              </button>
             </div>
             <div className="flex-1 relative">
               <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/10">
@@ -173,6 +175,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      <VirtualTryOn isOpen={isTryOnOpen} onClose={() => setIsTryOnOpen(false)} />
     </div>
   );
 };

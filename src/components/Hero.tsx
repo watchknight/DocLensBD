@@ -81,15 +81,15 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Arrows */}
-        <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all">
+        <button onClick={prev} className="absolute z-20 left-4 top-1/2 -translate-y-1/2 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all">
           <ChevronLeft size={24} />
         </button>
-        <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all">
+        <button onClick={next} className="absolute z-20 right-4 top-1/2 -translate-y-1/2 bg-white/15 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition-all">
           <ChevronRight size={24} />
         </button>
 
         {/* Dots */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="absolute z-20 bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
           {slides.map((_, idx) => (
             <button key={idx} onClick={() => setCurrent(idx)}
               className={`w-3 h-3 rounded-full transition-all ${idx === current ? 'bg-[#00BAC6] w-8' : 'bg-white/40 hover:bg-white/60'}`} />

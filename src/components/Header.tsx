@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Heart, Phone, ChevronDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
-const megaMenuData: Record<string, { title: string; links: { label: string; to: string }[] }[]> = {
+interface MegaMenuColumn {
+  title: string;
+  links: { label: string; to: string }[];
+}
+
+const megaMenuData: Record<string, MegaMenuColumn[]> = {
   eyeglasses: [
     { title: 'By Gender', links: [
       { label: 'Men', to: '/products?category=eyeglasses&gender=men' },
@@ -55,11 +61,36 @@ const megaMenuData: Record<string, { title: string; links: { label: string; to: 
   ],
 };
 
+const MegaMenu: React.FC<{ menuKey: string; columns: MegaMenuColumn[]; onClose: () => void }> = ({ columns, onClose }) => {
+  return (
+    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-0 z-50">
+      <div className="bg-white rounded-b-2xl shadow-2xl border border-gray-100 p-6 grid grid-cols-4 gap-6 min-w-[600px]">
+        {columns.map((col, i) => (
+          <div key={i}>
+            <h4 className="font-bold text-[#000042] text-xs uppercase tracking-wider mb-3">{col.title}</h4>
+            <ul className="space-y-2">
+              {col.links.map((link, j) => (
+                <li key={j}>
+                  <Link to={link.to} className="text-sm text-gray-600 hover:text-[#00BAC6] hover:pl-1 transition-all block" onClick={onClose}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMega, setActiveMega] = useState<string | null>(null);
+  const megaTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { getCartCount } = useCart();
+  const { user, profile, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -70,9 +101,31 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleMegaEnter = useCallback((key: string) => {
+    if (megaTimeoutRef.current) {
+      clearTimeout(megaTimeoutRef.current);
+      megaTimeoutRef.current = null;
+    }
+    setActiveMega(key);
+  }, []);
+
+  const handleMegaLeave = useCallback(() => {
+    megaTimeoutRef.current = setTimeout(() => {
+      setActiveMega(null);
+    }, 150);
+  }, []);
+
+  const closeMega = useCallback(() => {
+    setActiveMega(null);
+    if (megaTimeoutRef.current) {
+      clearTimeout(megaTimeoutRef.current);
+      megaTimeoutRef.current = null;
+    }
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
-      {/* Top Bar — Lenskart Deep Blue */}
+      {/* Top Bar */}
       <div className="bg-[#000042] text-white py-2 px-4">
         <div className="container mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-4">
@@ -93,7 +146,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <svg width="40" height="40" viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <ellipse cx="25" cy="30" rx="20" ry="18" stroke="#000042" strokeWidth="4" fill="none" />
               <ellipse cx="75" cy="30" rx="20" ry="18" stroke="#000042" strokeWidth="4" fill="none" />
@@ -122,15 +175,26 @@ const Header: React.FC = () => {
           </form>
 
           {/* Actions */}
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 flex-shrink-0">
             <Link to="/products" className="hidden md:flex flex-col items-center text-[#000042]/70 hover:text-[#000042] transition-colors relative">
               <Heart size={22} />
               <span className="text-[10px] font-medium mt-0.5">Wishlist</span>
             </Link>
-            <Link to="/about" className="hidden md:flex flex-col items-center text-[#000042]/70 hover:text-[#000042] transition-colors">
-              <User size={22} />
-              <span className="text-[10px] font-medium mt-0.5">Sign In</span>
-            </Link>
+            {user ? (
+              <div className="hidden md:flex flex-col items-center text-[#000042]/70 hover:text-[#000042] transition-colors relative group cursor-pointer">
+                <User size={22} className="text-[#00BAC6]" />
+                <span className="text-[10px] font-medium mt-0.5 truncate max-w-[50px]">{profile?.name?.split(' ')[0] || 'Profile'}</span>
+                <div className="absolute top-full right-0 mt-5 bg-white shadow-xl rounded-xl border border-gray-100 p-2 hidden group-hover:block min-w-[200px] z-50">
+                  <div className="px-3 py-2 text-xs text-gray-500 border-b border-gray-100 mb-1 truncate">{user.email}</div>
+                  <button onClick={logout} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium">Log Out</button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="hidden md:flex flex-col items-center text-[#000042]/70 hover:text-[#000042] transition-colors">
+                <User size={22} />
+                <span className="text-[10px] font-medium mt-0.5">Sign In</span>
+              </Link>
+            )}
             <Link to="/cart" className="flex flex-col items-center text-[#000042]/70 hover:text-[#000042] transition-colors relative">
               <ShoppingCart size={22} />
               <span className="text-[10px] font-medium mt-0.5">Cart</span>
@@ -140,7 +204,7 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
-            <button className="md:hidden text-[#000042]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="md:hidden text-[#000042]" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
@@ -157,63 +221,33 @@ const Header: React.FC = () => {
         </form>
       </div>
 
-      {/* Navigation — Lenskart Style */}
+      {/* Navigation */}
       <nav className="border-t border-gray-100 bg-white">
         <div className="container mx-auto px-4">
           <ul className={`md:flex items-center justify-center gap-0 ${isMenuOpen ? 'block' : 'hidden md:flex'}`}>
             {/* Eyeglasses with Mega Menu */}
-            <li className="nav-item relative group"
-              onMouseEnter={() => setActiveMega('eyeglasses')}
-              onMouseLeave={() => setActiveMega(null)}>
+            <li className="relative"
+              onMouseEnter={() => handleMegaEnter('eyeglasses')}
+              onMouseLeave={handleMegaLeave}>
               <Link to="/products?category=eyeglasses"
                 className="flex items-center gap-1 px-5 py-4 text-[#000042] font-semibold text-sm tracking-wide hover:text-[#00BAC6] transition-colors uppercase">
-                Eyeglasses <ChevronDown size={14} className="opacity-50" />
+                Eyeglasses <ChevronDown size={14} className={`opacity-50 transition-transform ${activeMega === 'eyeglasses' ? 'rotate-180' : ''}`} />
               </Link>
               {activeMega === 'eyeglasses' && (
-                <div className="mega-menu absolute left-1/2 -translate-x-1/2 top-full w-[700px] bg-white rounded-b-2xl shadow-2xl border border-gray-100 p-6 grid grid-cols-4 gap-6 z-50" style={{opacity:1,visibility:'visible',transform:'translateY(0)'}}>
-                  {megaMenuData.eyeglasses.map((col, i) => (
-                    <div key={i}>
-                      <h4 className="font-bold text-[#000042] text-xs uppercase tracking-wider mb-3">{col.title}</h4>
-                      <ul className="space-y-2">
-                        {col.links.map((link, j) => (
-                          <li key={j}>
-                            <Link to={link.to} className="text-sm text-gray-600 hover:text-[#00BAC6] hover:pl-1 transition-all" onClick={() => setActiveMega(null)}>
-                              {link.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+                <MegaMenu menuKey="eyeglasses" columns={megaMenuData.eyeglasses} onClose={closeMega} />
               )}
             </li>
 
             {/* Sunglasses with Mega Menu */}
-            <li className="nav-item relative group"
-              onMouseEnter={() => setActiveMega('sunglasses')}
-              onMouseLeave={() => setActiveMega(null)}>
+            <li className="relative"
+              onMouseEnter={() => handleMegaEnter('sunglasses')}
+              onMouseLeave={handleMegaLeave}>
               <Link to="/products?category=sunglasses"
                 className="flex items-center gap-1 px-5 py-4 text-[#000042] font-semibold text-sm tracking-wide hover:text-[#00BAC6] transition-colors uppercase">
-                Sunglasses <ChevronDown size={14} className="opacity-50" />
+                Sunglasses <ChevronDown size={14} className={`opacity-50 transition-transform ${activeMega === 'sunglasses' ? 'rotate-180' : ''}`} />
               </Link>
               {activeMega === 'sunglasses' && (
-                <div className="mega-menu absolute left-1/2 -translate-x-1/2 top-full w-[600px] bg-white rounded-b-2xl shadow-2xl border border-gray-100 p-6 grid grid-cols-4 gap-6 z-50" style={{opacity:1,visibility:'visible',transform:'translateY(0)'}}>
-                  {megaMenuData.sunglasses.map((col, i) => (
-                    <div key={i}>
-                      <h4 className="font-bold text-[#000042] text-xs uppercase tracking-wider mb-3">{col.title}</h4>
-                      <ul className="space-y-2">
-                        {col.links.map((link, j) => (
-                          <li key={j}>
-                            <Link to={link.to} className="text-sm text-gray-600 hover:text-[#00BAC6] hover:pl-1 transition-all" onClick={() => setActiveMega(null)}>
-                              {link.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+                <MegaMenu menuKey="sunglasses" columns={megaMenuData.sunglasses} onClose={closeMega} />
               )}
             </li>
 

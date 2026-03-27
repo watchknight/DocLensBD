@@ -1,22 +1,84 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { CheckCircle, CreditCard, Smartphone, Truck, ArrowLeft } from 'lucide-react';
+import { CheckCircle, CreditCard, Smartphone, Truck, ArrowLeft, Loader2 } from 'lucide-react';
+import { lensTypes } from '../data/products';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { useAuth } from '../context/AuthContext';
 
 const Checkout: React.FC = () => {
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const navigate = useNavigate();
+  const { cartItems, getCartTotal, clearCart, getItemLensPrice } = useCart();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderId, setOrderId] = useState('');
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: '', zip: '', payment: 'bkash' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const subtotal = getCartTotal();
+  const tax = Math.round(subtotal * 0.05);
+  const delivery = subtotal >= 3000 ? 0 : 150;
+  const total = subtotal + tax + delivery;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (step < 3) { setStep(step + 1); return; }
-    setOrderPlaced(true);
-    clearCart();
+    if (step < 3) {
+      setStep(step + 1);
+      return;
+    }
+    
+    try {
+      setIsProcessing(true);
+      
+      // 1. Create the Order in Firestore
+      const orderRef = await addDoc(collection(db, 'orders'), {
+        userId: user?.uid || 'guest',
+        customerName: form.name,
+        customerEmail: form.email,
+        phone: form.phone,
+        address: `${form.address}, ${form.city} - ${form.zip}`,
+        items: cartItems.map(item => ({
+          productId: item.product.id,
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price + getItemLensPrice(item),
+          lensType: item.lensType || 'none'
+        })),
+        subtotal,
+        tax,
+        delivery,
+        total,
+        status: 'pending',
+        paymentMethod: form.payment,
+        createdAt: new Date().toISOString()
+      });
+
+      // 2. Queue Email Trigger in Firestore (Firebase Extension pattern)
+      await addDoc(collection(db, 'emails'), {
+        to: form.email,
+        message: {
+          subject: `DocLensBD - Order Confirmation (#DL${orderRef.id.substring(0,6).toUpperCase()})`,
+          text: `Hi ${form.name},\n\nThank you for your order! Your payment method is ${form.payment.toUpperCase()}.\n\nTotal: ৳${total}\n\nWe will notify you when it ships.`,
+          html: `<div style="font-family:sans-serif;color:#000042;"><h2>Thank you for your order, ${form.name}!</h2><p>Your order <strong>#DL${orderRef.id.substring(0,6).toUpperCase()}</strong> has been securely placed.</p><p>Total Amount: <strong>৳${total}</strong></p><p>We will update you via email exactly when your package ships!</p></div>`
+        }
+      });
+
+      setOrderId(`DL${orderRef.id.substring(0,6).toUpperCase()}`);
+      setOrderPlaced(true);
+      clearCart();
+    } catch (error) {
+      console.error("Failed to process order:", error);
+      alert("There was an issue processing your order. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const total = getCartTotal() + Math.round(getCartTotal() * 0.05) + (getCartTotal() >= 3000 ? 0 : 150);
+  const getLensTypeName = (lensId: string) => {
+    return lensTypes.find(l => l.id === lensId)?.name || lensId;
+  };
 
   if (orderPlaced) {
     return (
@@ -26,8 +88,8 @@ const Checkout: React.FC = () => {
             <CheckCircle className="text-green-600" size={48} />
           </div>
           <h2 className="text-3xl font-bold text-[#000042] mb-2">Order Placed!</h2>
-          <p className="text-gray-500 mb-6">Your order has been placed successfully. You will receive a confirmation on your phone.</p>
-          <p className="text-lg font-semibold text-[#000042] mb-4">Order #DL{Date.now().toString().slice(-6)}</p>
+          <p className="text-gray-500 mb-6">Your order has been securely placed in our database. An automated email receipt will be sent shortly.</p>
+          <p className="text-lg font-semibold text-[#000042] mb-4">Order #{orderId}</p>
           <Link to="/" className="inline-flex items-center gap-2 bg-[#000042] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#000060]">Continue Shopping</Link>
         </div>
       </div>
@@ -71,14 +133,32 @@ const Checkout: React.FC = () => {
                 <div className="bg-white rounded-2xl shadow-md p-6 space-y-5">
                   <h2 className="text-xl font-bold text-[#000042]">Shipping Details</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className="text-sm font-medium text-gray-600 block mb-1">Full Name</label><input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" /></div>
-                    <div><label className="text-sm font-medium text-gray-600 block mb-1">Email</label><input type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" /></div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600 block mb-1">Full Name</label>
+                      <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600 block mb-1">Email</label>
+                      <input type="email" required value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" />
+                    </div>
                   </div>
-                  <div><label className="text-sm font-medium text-gray-600 block mb-1">Phone</label><input required value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" /></div>
-                  <div><label className="text-sm font-medium text-gray-600 block mb-1">Address</label><textarea required rows={3} value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" /></div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600 block mb-1">Phone</label>
+                    <input required value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600 block mb-1">Address</label>
+                    <textarea required rows={3} value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" />
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div><label className="text-sm font-medium text-gray-600 block mb-1">City</label><input required value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" /></div>
-                    <div><label className="text-sm font-medium text-gray-600 block mb-1">ZIP Code</label><input required value={form.zip} onChange={e => setForm({...form, zip: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" /></div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600 block mb-1">City</label>
+                      <input required value={form.city} onChange={e => setForm({...form, city: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600 block mb-1">ZIP Code</label>
+                      <input required value={form.zip} onChange={e => setForm({...form, zip: e.target.value})} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#000042]" />
+                    </div>
                   </div>
                   <button type="submit" className="w-full bg-[#000042] text-white py-4 rounded-xl font-bold hover:bg-[#000060] transition-all text-lg">Continue to Payment</button>
                 </div>
@@ -96,7 +176,10 @@ const Checkout: React.FC = () => {
                     <label key={p.id} className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${form.payment === p.id ? 'border-[#000042] bg-[#000042]/5' : 'border-gray-200 hover:border-gray-400'}`}>
                       <input type="radio" name="payment" value={p.id} checked={form.payment === p.id} onChange={() => setForm({...form, payment: p.id})} className="accent-[#000042]" />
                       {p.icon}
-                      <div><p className="font-medium text-[#000042]">{p.label}</p><p className="text-xs text-gray-500">{p.desc}</p></div>
+                      <div>
+                        <p className="font-medium text-[#000042]">{p.label}</p>
+                        <p className="text-xs text-gray-500">{p.desc}</p>
+                      </div>
                     </label>
                   ))}
                   <div className="flex gap-3">
@@ -116,20 +199,28 @@ const Checkout: React.FC = () => {
                     <p className="text-sm text-[#00BAC6] font-medium mt-2">Payment: {form.payment.toUpperCase()}</p>
                   </div>
                   <div className="space-y-3">
-                    {cartItems.map(item => (
-                      <div key={item.product.id} className="flex items-center gap-4 py-3 border-b last:border-0">
-                        <img src={item.product.images[0]} alt="" className="w-16 h-16 object-cover rounded-lg" />
-                        <div className="flex-1">
-                          <p className="font-medium text-[#000042] text-sm">{item.product.name}</p>
-                          <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+                    {cartItems.map(item => {
+                      const lensPrice = getItemLensPrice(item);
+                      return (
+                        <div key={item.id} className="flex items-center gap-4 py-3 border-b last:border-0">
+                          <img src={item.product.images[0]} alt="" className="w-16 h-16 object-cover rounded-lg" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-[#000042] text-sm truncate">{item.product.name}</p>
+                            <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+                            {item.lensType && (
+                              <p className="text-xs text-gray-500">Lens: {getLensTypeName(item.lensType)}</p>
+                            )}
+                          </div>
+                          <p className="font-bold text-[#000042]">৳{((item.product.price + lensPrice) * item.quantity).toLocaleString()}</p>
                         </div>
-                        <p className="font-bold text-[#000042]">৳{(item.product.price * item.quantity).toLocaleString()}</p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
-                  <div className="flex gap-3">
-                    <button type="button" onClick={() => setStep(2)} className="flex items-center gap-2 border-2 border-gray-200 text-gray-600 px-6 py-3 rounded-xl font-medium hover:bg-gray-50"><ArrowLeft size={18} /> Back</button>
-                    <button type="submit" className="flex-1 bg-[#00BAC6] text-white py-4 rounded-xl font-bold hover:bg-[#00a8b3] transition-all text-lg shadow-lg">Place Order — ৳{total.toLocaleString()}</button>
+                  <div className="flex gap-3 mt-8">
+                    <button type="button" onClick={() => setStep(2)} className="flex items-center gap-2 border-2 border-gray-200 text-gray-600 px-6 py-3 rounded-xl font-medium hover:bg-gray-50" disabled={isProcessing}><ArrowLeft size={18} /> Back</button>
+                    <button type="submit" disabled={isProcessing} className="flex-1 bg-[#00BAC6] flex items-center justify-center gap-2 text-white py-4 rounded-xl font-bold hover:bg-[#00a8b3] transition-all text-lg shadow-lg disabled:opacity-70">
+                      {isProcessing ? <><Loader2 size={24} className="animate-spin" /> Processing Securely...</> : `Place Order — ৳${total.toLocaleString()}`}
+                    </button>
                   </div>
                 </div>
               )}
@@ -140,9 +231,9 @@ const Checkout: React.FC = () => {
           <div className="bg-white rounded-2xl shadow-md p-6 h-fit sticky top-40">
             <h3 className="font-bold text-[#000042] mb-4">Order Summary</h3>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-gray-500">Items ({cartItems.length})</span><span>৳{getCartTotal().toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Delivery</span><span className={getCartTotal() >= 3000 ? 'text-green-600 font-medium' : ''}>{getCartTotal() >= 3000 ? 'FREE' : '৳150'}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Tax (5%)</span><span>৳{Math.round(getCartTotal() * 0.05).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Items ({cartItems.length})</span><span>৳{subtotal.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Delivery</span><span className={delivery === 0 ? 'text-green-600 font-medium' : ''}>{delivery === 0 ? 'FREE' : `৳${delivery}`}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Tax (5%)</span><span>৳{tax.toLocaleString()}</span></div>
               <hr />
               <div className="flex justify-between text-lg font-bold text-[#000042]"><span>Total</span><span>৳{total.toLocaleString()}</span></div>
             </div>

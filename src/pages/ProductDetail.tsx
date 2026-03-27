@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ShoppingCart, Heart, Star, Shield, RotateCcw, Truck, CheckCircle, ChevronRight, Ruler, Minus, Plus } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Heart, Star, Shield, RotateCcw, Truck, CheckCircle, ChevronRight, Ruler, Minus, Plus, X } from 'lucide-react';
 import { products, lensTypes, lensCoatings } from '../data/products';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const product = products.find(p => p.id === Number(id));
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -16,6 +17,7 @@ const ProductDetail: React.FC = () => {
   const [pincode, setPincode] = useState('');
   const [pincodeValid, setPincodeValid] = useState<boolean | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [addedFeedback, setAddedFeedback] = useState(false);
 
   if (!product) {
     return (
@@ -38,15 +40,48 @@ const ProductDetail: React.FC = () => {
     setPincodeValid(pincode.length >= 4);
   };
 
+  const showAddedFeedback = () => {
+    setAddedFeedback(true);
+    setTimeout(() => setAddedFeedback(false), 2000);
+  };
+
   const handleAddToCart = () => {
+    const lens = selectedLens || undefined;
+    const coatings = selectedCoatings.length > 0 ? selectedCoatings : undefined;
     for (let i = 0; i < quantity; i++) {
-      addToCart(product, selectedLens, selectedCoatings);
+      addToCart(product, lens, coatings);
     }
     setShowLensFlow(false);
+    showAddedFeedback();
+  };
+
+  const handleAddToCartFromModal = () => {
+    const lens = selectedLens || undefined;
+    const coatings = selectedCoatings.length > 0 ? selectedCoatings : undefined;
+    addToCart(product, lens, coatings);
+    setShowLensFlow(false);
+    showAddedFeedback();
+  };
+
+  const toggleCoating = (coatingId: string) => {
+    setSelectedCoatings(prev =>
+      prev.includes(coatingId)
+        ? prev.filter(c => c !== coatingId)
+        : [...prev, coatingId]
+    );
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Added to cart feedback */}
+      {addedFeedback && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 animate-bounce">
+          <CheckCircle size={20} />
+          <span className="font-semibold">Added to cart!</span>
+          <button onClick={() => navigate('/cart')} className="underline text-sm ml-2">View Cart</button>
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-3">
@@ -57,7 +92,7 @@ const ProductDetail: React.FC = () => {
             <ChevronRight size={14} />
             <Link to={`/products?category=${product.category}`} className="hover:text-[#000042] capitalize">{product.category.replace('-', ' ')}</Link>
             <ChevronRight size={14} />
-            <span className="text-[#000042] font-medium">{product.name}</span>
+            <span className="text-[#000042] font-medium line-clamp-1">{product.name}</span>
           </nav>
         </div>
       </div>
@@ -112,7 +147,7 @@ const ProductDetail: React.FC = () => {
               {product.lensWidth && (
                 <div className="mt-5">
                   <h3 className="font-semibold text-[#000042] flex items-center gap-2 mb-3"><Ruler size={16} /> Frame Dimensions</h3>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-wrap">
                     <div className="text-center px-4 py-2 bg-gray-50 rounded-lg">
                       <p className="text-xs text-gray-500">Lens Width</p>
                       <p className="font-bold text-[#000042]">{product.lensWidth}mm</p>
@@ -178,15 +213,15 @@ const ProductDetail: React.FC = () => {
               {/* Trust Badges */}
               <div className="mt-6 grid grid-cols-3 gap-3">
                 <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
-                  <RotateCcw size={18} className="text-[#00BAC6]" />
+                  <RotateCcw size={18} className="text-[#00BAC6] flex-shrink-0" />
                   <span className="text-xs text-gray-600 font-medium">14-Day<br />Exchange</span>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
-                  <Shield size={18} className="text-[#00BAC6]" />
+                  <Shield size={18} className="text-[#00BAC6] flex-shrink-0" />
                   <span className="text-xs text-gray-600 font-medium">1 Year<br />Warranty</span>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
-                  <Truck size={18} className="text-[#00BAC6]" />
+                  <Truck size={18} className="text-[#00BAC6] flex-shrink-0" />
                   <span className="text-xs text-gray-600 font-medium">Free<br />Delivery</span>
                 </div>
               </div>
@@ -197,7 +232,7 @@ const ProductDetail: React.FC = () => {
                 <ul className="space-y-2">
                   {product.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle size={16} className="text-[#00BAC6]" /> {feature}
+                      <CheckCircle size={16} className="text-[#00BAC6] flex-shrink-0" /> {feature}
                     </li>
                   ))}
                 </ul>
@@ -214,9 +249,16 @@ const ProductDetail: React.FC = () => {
 
         {/* Lens Selection Modal */}
         {showLensFlow && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowLensFlow(false)}>
-            <div className="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6 relative">
+              {/* Close button */}
+              <button onClick={() => setShowLensFlow(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition-colors">
+                <X size={24} />
+              </button>
+              
               <h2 className="text-xl font-bold text-[#000042] mb-6">Select Your Lenses</h2>
+              
+              {/* Lens Type */}
               <div className="mb-6">
                 <h3 className="font-semibold text-[#000042] mb-3">Lens Type</h3>
                 <div className="space-y-2">
@@ -234,6 +276,8 @@ const ProductDetail: React.FC = () => {
                   ))}
                 </div>
               </div>
+              
+              {/* Coatings */}
               <div className="mb-6">
                 <h3 className="font-semibold text-[#000042] mb-3">Coatings</h3>
                 <div className="space-y-2">
@@ -241,7 +285,7 @@ const ProductDetail: React.FC = () => {
                     <label key={coating.id} className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedCoatings.includes(coating.id) ? 'border-[#00BAC6] bg-[#00BAC6]/5' : 'border-gray-200 hover:border-gray-400'}`}>
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={selectedCoatings.includes(coating.id)}
-                          onChange={() => setSelectedCoatings(prev => prev.includes(coating.id) ? prev.filter(c => c !== coating.id) : [...prev, coating.id])}
+                          onChange={() => toggleCoating(coating.id)}
                           className="accent-[#00BAC6]" />
                         <div>
                           <p className="font-medium text-[#000042]">{coating.name}</p>
@@ -253,13 +297,15 @@ const ProductDetail: React.FC = () => {
                   ))}
                 </div>
               </div>
+              
+              {/* Total and Add to Cart */}
               <div className="border-t pt-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Total Price</p>
                   <p className="text-2xl font-bold text-[#000042]">৳{(product.price + lensPrice).toLocaleString()}</p>
                 </div>
-                <button onClick={handleAddToCart} className="bg-[#000042] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#000060] transition-all">
-                  Add to Cart
+                <button onClick={handleAddToCartFromModal} className="bg-[#000042] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#000060] transition-all flex items-center gap-2">
+                  <ShoppingCart size={18} /> Add to Cart
                 </button>
               </div>
             </div>

@@ -92,10 +92,7 @@ async function main() {
   console.log('Node:', NODE, process.version);
   console.log('CWD:', CWD);
 
-  if (fs.existsSync(path.join(CWD, 'node_modules', 'react'))) {
-    console.log('Dependencies already installed.');
-    return;
-  }
+  // Removed early return to allow installing new dependencies
 
   const tmpDir = path.join(CWD, '_npm_tmp');
   fs.mkdirSync(tmpDir, { recursive: true });
