@@ -109,12 +109,12 @@ const ManageProducts: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-[#000042]">Inventory Management</h2>
+          <h2 className="text-2xl font-bold text-[#0A0A3E]">Inventory Management</h2>
           <p className="text-sm text-gray-500 mt-1">Add, edit, and organize your products.</p>
         </div>
         <button 
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 bg-[#00BAC6] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-[#00BAC6]/20 hover:bg-[#00a8b3] transition-colors"
+          className="flex items-center gap-2 bg-[#00C9D6] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-[#00C9D6]/20 hover:bg-[#00B3BF] transition-colors"
         >
           <Plus size={18} /> New Product
         </button>
@@ -129,7 +129,7 @@ const ManageProducts: React.FC = () => {
                placeholder="Search products..." 
                value={searchTerm}
                onChange={(e) => setSearchTerm(e.target.value)}
-               className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#00BAC6]/20 outline-none"
+               className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#00C9D6]/20 outline-none"
              />
              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
            </div>
@@ -160,11 +160,11 @@ const ManageProducts: React.FC = () => {
                    <td colSpan={5} className="px-6 py-12 text-center bg-gray-50/50">
                      <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
                        <Database size={48} className="text-gray-300 mb-4" />
-                       <h3 className="text-[#000042] font-bold text-lg mb-2">Database is Empty</h3>
+                       <h3 className="text-[#0A0A3E] font-bold text-lg mb-2">Database is Empty</h3>
                        <p className="text-sm text-gray-500 mb-6">You currently have no products in your live cloud database. Let's securely migrate your local product data to the cloud.</p>
                        <button 
                          onClick={handleMigrate}
-                         className="flex items-center gap-2 bg-[#000042] text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-900 transition-colors w-full justify-center"
+                         className="flex items-center gap-2 bg-[#0A0A3E] text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md hover:bg-blue-900 transition-colors w-full justify-center"
                        >
                          <Database size={18} /> Push Local Data to Firebase
                        </button>
@@ -184,7 +184,7 @@ const ManageProducts: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <p className="font-bold text-[#000042]">{product.name}</p>
+                        <p className="font-bold text-[#0A0A3E]">{product.name}</p>
                         <p className="text-xs text-gray-500">ID: {String(product.id).substring(0,8)}...</p>
                       </div>
                     </td>
@@ -198,7 +198,7 @@ const ManageProducts: React.FC = () => {
                          {product.category}
                        </span>
                     </td>
-                    <td className="px-6 py-4 font-bold text-[#00BAC6]">৳{product.price}</td>
+                    <td className="px-6 py-4 font-bold text-[#00C9D6]">৳{product.price}</td>
                     <td className="px-6 py-4 text-right space-x-2 w-32">
                       <button className="text-gray-400 hover:text-blue-600 transition-colors p-1" title="Edit">
                         <Edit2 size={16} />
@@ -219,7 +219,7 @@ const ManageProducts: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h3 className="text-xl font-bold text-[#000042]">Add New Product</h3>
+              <h3 className="text-xl font-bold text-[#0A0A3E]">Add New Product</h3>
               <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
                 <X size={20} />
               </button>
@@ -229,21 +229,21 @@ const ManageProducts: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                    <input required value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00BAC6]/20 outline-none" />
+                    <input required value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00C9D6]/20 outline-none" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-                    <input required value={newProduct.brand} onChange={e => setNewProduct({...newProduct, brand: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00BAC6]/20 outline-none" />
+                    <input required value={newProduct.brand} onChange={e => setNewProduct({...newProduct, brand: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00C9D6]/20 outline-none" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Price (৳)</label>
-                    <input type="number" required value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: Number(e.target.value)})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00BAC6]/20 outline-none" />
+                    <input type="number" required value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: Number(e.target.value)})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00C9D6]/20 outline-none" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select required value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00BAC6]/20 outline-none">
+                    <select required value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00C9D6]/20 outline-none">
                       <option value="eyeglasses">Eyeglasses</option>
                       <option value="sunglasses">Sunglasses</option>
                       <option value="computer-glasses">Computer Glasses</option>
@@ -253,17 +253,17 @@ const ManageProducts: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                  <input required value={newProduct.images[0]} onChange={e => setNewProduct({...newProduct, images: [e.target.value]})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00BAC6]/20 outline-none" placeholder="https://..." />
+                  <input required value={newProduct.images[0]} onChange={e => setNewProduct({...newProduct, images: [e.target.value]})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00C9D6]/20 outline-none" placeholder="https://..." />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <textarea rows={3} value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00BAC6]/20 outline-none" />
+                  <textarea rows={3} value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[#00C9D6]/20 outline-none" />
                 </div>
               </form>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50">
                <button onClick={() => setIsAdding(false)} type="button" className="px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-white border-transparent hover:border-gray-200 border rounded-xl transition-all">Cancel</button>
-               <button type="submit" form="add-product-form" disabled={isSaving} className="px-5 py-2.5 text-sm font-bold bg-[#00BAC6] text-white rounded-xl shadow-sm hover:bg-[#00a8b3] transition-colors disabled:opacity-50">
+               <button type="submit" form="add-product-form" disabled={isSaving} className="px-5 py-2.5 text-sm font-bold bg-[#00C9D6] text-white rounded-xl shadow-sm hover:bg-[#00B3BF] transition-colors disabled:opacity-50">
                  {isSaving ? 'Saving...' : 'Add Product'}
                </button>
             </div>

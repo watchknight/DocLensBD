@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       {/* We can show a full-screen spinner if loading, or just wrap children */}
       {loading ? (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#000042]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A0A3E]"></div>
         </div>
       ) : (
         children

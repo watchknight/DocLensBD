@@ -15,9 +15,9 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#000042] text-white flex flex-col shrink-0">
+      <aside className="w-64 bg-[#0A0A3E] text-white flex flex-col shrink-0">
         <div className="p-6 border-b border-blue-900/50">
-          <h2 className="text-2xl font-bold tracking-wide">DocLens<span className="text-[#00BAC6]">Admin</span></h2>
+          <h2 className="text-2xl font-bold tracking-wide">DocLens<span className="text-[#00C9D6]">Admin</span></h2>
           <p className="text-xs text-blue-300 mt-1">Logged in as {profile?.name}</p>
         </div>
 
@@ -26,7 +26,7 @@ const AdminLayout: React.FC = () => {
             <li>
               <NavLink 
                 to="/admin/dashboard" 
-                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive ? 'bg-[#00BAC6] text-white shadow-lg shadow-cyan-500/20' : 'text-blue-100 hover:bg-white/10'}`}
+                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive ? 'bg-[#00C9D6] text-white shadow-lg shadow-cyan-500/20' : 'text-blue-100 hover:bg-white/10'}`}
               >
                 <LayoutDashboard size={20} /> Dashboard
               </NavLink>
@@ -34,7 +34,7 @@ const AdminLayout: React.FC = () => {
             <li>
               <NavLink 
                 to="/admin/products" 
-                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive ? 'bg-[#00BAC6] text-white shadow-lg shadow-cyan-500/20' : 'text-blue-100 hover:bg-white/10'}`}
+                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive ? 'bg-[#00C9D6] text-white shadow-lg shadow-cyan-500/20' : 'text-blue-100 hover:bg-white/10'}`}
               >
                 <PackageSearch size={20} /> Manage Products
               </NavLink>
@@ -42,7 +42,7 @@ const AdminLayout: React.FC = () => {
             <li>
               <NavLink 
                 to="/admin/orders" 
-                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive ? 'bg-[#00BAC6] text-white shadow-lg shadow-cyan-500/20' : 'text-blue-100 hover:bg-white/10'}`}
+                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive ? 'bg-[#00C9D6] text-white shadow-lg shadow-cyan-500/20' : 'text-blue-100 hover:bg-white/10'}`}
               >
                 <ShoppingBag size={20} /> View Orders
               </NavLink>
@@ -72,7 +72,7 @@ const AdminLayout: React.FC = () => {
         <header className="bg-white border-b border-gray-100 px-8 py-4 sticky top-0 z-10 flex items-center justify-between shadow-sm">
            <h1 className="text-xl font-bold text-gray-800">Control Center</h1>
            <div className="flex items-center gap-3">
-             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#000042] to-[#00BAC6] flex items-center justify-center text-white font-bold text-sm shadow-md">
+             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0A0A3E] to-[#00C9D6] flex items-center justify-center text-white font-bold text-sm shadow-md">
                 {profile?.name?.charAt(0)?.toUpperCase()}
              </div>
            </div>

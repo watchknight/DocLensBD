@@ -74,44 +74,44 @@ const Products: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAFBFD]">
       {/* Top Bar */}
-      <div className="bg-white border-b sticky top-[129px] z-30">
+      <div className="bg-white border-b border-[#E8EAF2] sticky top-[96px] z-30">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">
               <button onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 bg-[#000042] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#000060] transition-colors text-sm">
+                className="flex items-center gap-2 bg-[#0A0A3E] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#12124F] transition-colors text-sm btn-press">
                 <SlidersHorizontal size={16} />
                 Filters
                 {activeFilterCount > 0 && (
-                  <span className="bg-[#00BAC6] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  <span className="bg-[#00C9D6] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                     {activeFilterCount}
                   </span>
                 )}
               </button>
               {activeFilterCount > 0 && (
-                <button onClick={clearFilters} className="text-sm text-[#00BAC6] hover:underline">Clear all</button>
+                <button onClick={clearFilters} className="text-sm text-[#00C9D6] hover:underline">Clear all</button>
               )}
-              <span className="text-sm text-gray-500">{filteredProducts.length} products found</span>
+              <span className="text-sm text-[#9CA0B8]">{filteredProducts.length} products found</span>
             </div>
             <div className="flex items-center gap-3">
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#000042]">
+                className="border border-[#E8EAF2] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00C9D6]/30 bg-white text-[#0A0A3E]">
                 <option value="popularity">Sort by Popularity</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
                 <option value="rating">Top Rated</option>
                 <option value="newest">Newest First</option>
               </select>
-              <div className="hidden md:flex items-center border border-gray-200 rounded-lg overflow-hidden">
+              <div className="hidden md:flex items-center border border-[#E8EAF2] rounded-lg overflow-hidden">
                 <button onClick={() => setViewMode('grid')}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-[#000042] text-white' : 'text-gray-400 hover:bg-gray-100'}`}
+                  className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-[#0A0A3E] text-white' : 'text-[#9CA0B8] hover:bg-[#F0F2F8]'}`}
                   aria-label="Grid view">
                   <Grid size={18} />
                 </button>
                 <button onClick={() => setViewMode('list')}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-[#000042] text-white' : 'text-gray-400 hover:bg-gray-100'}`}
+                  className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-[#0A0A3E] text-white' : 'text-[#9CA0B8] hover:bg-[#F0F2F8]'}`}
                   aria-label="List view">
                   <List size={18} />
                 </button>
@@ -126,15 +126,15 @@ const Products: React.FC = () => {
           {/* Filters Sidebar */}
           {showFilters && (
             <aside className="hidden md:block w-64 flex-shrink-0">
-              <div className="bg-white rounded-xl shadow-md p-5 sticky top-[200px] space-y-6 max-h-[calc(100vh-220px)] overflow-y-auto">
+              <div className="bg-white rounded-2xl shadow-card p-5 sticky top-[180px] space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto border border-[#E8EAF2]">
                 {/* Category */}
                 <div>
-                  <h3 className="font-bold text-[#000042] text-sm uppercase tracking-wider mb-3">Category</h3>
+                  <h3 className="font-bold text-[#0A0A3E] text-xs uppercase tracking-wider mb-3 font-display">Category</h3>
                   {['', 'eyeglasses', 'sunglasses', 'computer-glasses', 'kids', 'reading'].map(cat => (
-                    <label key={cat || 'all'} className="flex items-center gap-2 py-1 cursor-pointer text-sm">
+                    <label key={cat || 'all'} className="flex items-center gap-2 py-1.5 cursor-pointer text-sm">
                       <input type="radio" name="category" checked={selectedCategory === cat} onChange={() => setSelectedCategory(cat)}
-                        className="accent-[#000042]" />
-                      <span className={selectedCategory === cat ? 'text-[#000042] font-semibold' : 'text-gray-600'}>
+                        className="accent-[#0A0A3E]" />
+                      <span className={selectedCategory === cat ? 'text-[#0A0A3E] font-semibold' : 'text-[#5A5E7A]'}>
                         {getCategoryLabel(cat)}
                       </span>
                     </label>
@@ -143,12 +143,12 @@ const Products: React.FC = () => {
 
                 {/* Gender */}
                 <div>
-                  <h3 className="font-bold text-[#000042] text-sm uppercase tracking-wider mb-3">Gender</h3>
+                  <h3 className="font-bold text-[#0A0A3E] text-xs uppercase tracking-wider mb-3 font-display">Gender</h3>
                   {['', 'men', 'women', 'unisex', 'kids'].map(g => (
-                    <label key={g || 'all'} className="flex items-center gap-2 py-1 cursor-pointer text-sm">
+                    <label key={g || 'all'} className="flex items-center gap-2 py-1.5 cursor-pointer text-sm">
                       <input type="radio" name="gender" checked={selectedGender === g} onChange={() => setSelectedGender(g)}
-                        className="accent-[#000042]" />
-                      <span className={selectedGender === g ? 'text-[#000042] font-semibold' : 'text-gray-600'}>
+                        className="accent-[#0A0A3E]" />
+                      <span className={selectedGender === g ? 'text-[#0A0A3E] font-semibold' : 'text-[#5A5E7A]'}>
                         {g ? g.charAt(0).toUpperCase() + g.slice(1) : 'All'}
                       </span>
                     </label>
@@ -157,11 +157,11 @@ const Products: React.FC = () => {
 
                 {/* Frame Shape */}
                 <div>
-                  <h3 className="font-bold text-[#000042] text-sm uppercase tracking-wider mb-3">Frame Shape</h3>
+                  <h3 className="font-bold text-[#0A0A3E] text-xs uppercase tracking-wider mb-3 font-display">Frame Shape</h3>
                   <div className="flex flex-wrap gap-2">
                     {frameShapes.map(shape => (
                       <button key={shape.id} onClick={() => setSelectedShape(selectedShape === shape.id ? '' : shape.id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedShape === shape.id ? 'bg-[#000042] text-white border-[#000042]' : 'border-gray-200 text-gray-600 hover:border-[#000042]'}`}>
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all btn-press ${selectedShape === shape.id ? 'bg-[#0A0A3E] text-white border-[#0A0A3E]' : 'border-[#E8EAF2] text-[#5A5E7A] hover:border-[#0A0A3E]'}`}>
                         {shape.name}
                       </button>
                     ))}
@@ -170,12 +170,12 @@ const Products: React.FC = () => {
 
                 {/* Frame Type */}
                 <div>
-                  <h3 className="font-bold text-[#000042] text-sm uppercase tracking-wider mb-3">Frame Type</h3>
+                  <h3 className="font-bold text-[#0A0A3E] text-xs uppercase tracking-wider mb-3 font-display">Frame Type</h3>
                   {['', 'full-rim', 'half-rim', 'rimless'].map(t => (
-                    <label key={t || 'all'} className="flex items-center gap-2 py-1 cursor-pointer text-sm">
+                    <label key={t || 'all'} className="flex items-center gap-2 py-1.5 cursor-pointer text-sm">
                       <input type="radio" name="frameType" checked={selectedType === t} onChange={() => setSelectedType(t)}
-                        className="accent-[#000042]" />
-                      <span className={selectedType === t ? 'text-[#000042] font-semibold' : 'text-gray-600'}>
+                        className="accent-[#0A0A3E]" />
+                      <span className={selectedType === t ? 'text-[#0A0A3E] font-semibold' : 'text-[#5A5E7A]'}>
                         {getCategoryLabel(t)}
                       </span>
                     </label>
@@ -184,11 +184,11 @@ const Products: React.FC = () => {
 
                 {/* Color */}
                 <div>
-                  <h3 className="font-bold text-[#000042] text-sm uppercase tracking-wider mb-3">Color</h3>
+                  <h3 className="font-bold text-[#0A0A3E] text-xs uppercase tracking-wider mb-3 font-display">Color</h3>
                   <div className="flex flex-wrap gap-2">
                     {frameColors.slice(0, 8).map(c => (
                       <button key={c} onClick={() => setSelectedColor(selectedColor === c ? '' : c)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedColor === c ? 'bg-[#000042] text-white border-[#000042]' : 'border-gray-200 text-gray-600 hover:border-[#000042]'}`}>
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all btn-press ${selectedColor === c ? 'bg-[#0A0A3E] text-white border-[#0A0A3E]' : 'border-[#E8EAF2] text-[#5A5E7A] hover:border-[#0A0A3E]'}`}>
                         {c}
                       </button>
                     ))}
@@ -197,11 +197,11 @@ const Products: React.FC = () => {
 
                 {/* Price Range */}
                 <div>
-                  <h3 className="font-bold text-[#000042] text-sm uppercase tracking-wider mb-3">Price Range</h3>
+                  <h3 className="font-bold text-[#0A0A3E] text-xs uppercase tracking-wider mb-3 font-display">Price Range</h3>
                   <input type="range" min="0" max="10000" step="500" value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="w-full accent-[#000042]" />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    className="w-full accent-[#0A0A3E]" />
+                  <div className="flex justify-between text-xs text-[#9CA0B8] mt-1">
                     <span>৳0</span><span>৳{priceRange[1].toLocaleString()}</span>
                   </div>
                 </div>
@@ -213,10 +213,12 @@ const Products: React.FC = () => {
           <main className="flex-1 min-w-0">
             {filteredProducts.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-6xl mb-4">🔍</p>
-                <h3 className="text-xl font-bold text-[#000042] mb-2">No products found</h3>
-                <p className="text-gray-500 mb-4">Try adjusting your filters or search terms</p>
-                <button onClick={clearFilters} className="bg-[#00BAC6] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#00a8b3] transition-colors">
+                <div className="w-20 h-20 rounded-full bg-[#F0F2F8] flex items-center justify-center mx-auto mb-6">
+                  <span className="text-4xl">🔍</span>
+                </div>
+                <h3 className="text-xl font-bold text-[#0A0A3E] mb-2 font-display">No products found</h3>
+                <p className="text-[#5A5E7A] mb-4">Try adjusting your filters or search terms</p>
+                <button onClick={clearFilters} className="bg-[#00C9D6] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#00B3BF] transition-colors btn-press">
                   Clear Filters
                 </button>
               </div>

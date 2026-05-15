@@ -54,7 +54,7 @@ const AdminOrders: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-[#000042]">Order Management</h2>
+        <h2 className="text-2xl font-bold text-[#0A0A3E]">Order Management</h2>
         <div className="text-sm text-gray-500 font-medium">Real-time updates active</div>
       </div>
 
@@ -79,14 +79,14 @@ const AdminOrders: React.FC = () => {
                 orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 border-b">
-                      <p className="font-bold text-[#000042]">#{order.id.substring(0,8).toUpperCase()}</p>
+                      <p className="font-bold text-[#0A0A3E]">#{order.id.substring(0,8).toUpperCase()}</p>
                       <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString()}</p>
                     </td>
                     <td className="px-6 py-4">
                       <p className="font-medium text-gray-800">{order.customerName}</p>
                       <p className="text-xs text-gray-500">{order.customerEmail}</p>
                     </td>
-                    <td className="px-6 py-4 font-bold text-[#00BAC6]">৳{order.total}</td>
+                    <td className="px-6 py-4 font-bold text-[#00C9D6]">৳{order.total}</td>
                     <td className="px-6 py-4">
                       {getStatusBadge(order.status)}
                     </td>
@@ -94,7 +94,7 @@ const AdminOrders: React.FC = () => {
                       <select 
                         value={order.status}
                         onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#00BAC6] bg-gray-50 font-medium cursor-pointer mr-3"
+                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#00C9D6] bg-gray-50 font-medium cursor-pointer mr-3"
                       >
                         <option value="pending">Pending</option>
                         <option value="processing">Processing</option>
