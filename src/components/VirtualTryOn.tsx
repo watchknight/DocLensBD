@@ -120,8 +120,8 @@ const VirtualTryOn: React.FC<VirtualTryOnProps> = ({ isOpen, onClose, initialPro
   }, [selectedProductId, selectedProduct.images, selectedProduct.tryOnImage]);
 
   useEffect(() => {
-    let camera: Camera | null = null;
-    let faceMesh: FaceMesh | null = null;
+    let camera: any = null;
+    let faceMesh: any = null;
 
     const initializeCameraAndMesh = async () => {
       try {
@@ -129,7 +129,7 @@ const VirtualTryOn: React.FC<VirtualTryOnProps> = ({ isOpen, onClose, initialPro
         setHasPermission(true);
 
         faceMesh = new FaceMesh({
-          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+          locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
         });
 
         faceMesh.setOptions({
