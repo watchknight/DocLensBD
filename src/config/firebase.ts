@@ -6,13 +6,13 @@ import { getFirestore } from 'firebase/firestore';
 // You can get these by creating a new project at https://console.firebase.google.com
 // Click the Web icon (</>) to register an app, and copy the firebaseConfig object here.
 const firebaseConfig = {
-  apiKey: "AIzaSyBW1eUcqyi6RUVycPKsSD6rNz0fVCTj1G4",
-  authDomain: "doclensbd-1cdeb.firebaseapp.com",
-  projectId: "doclensbd-1cdeb",
-  storageBucket: "doclensbd-1cdeb.firebasestorage.app",
-  messagingSenderId: "190460046287",
-  appId: "1:190460046287:web:dbb20cce777a84744c80ba",
-  measurementId: "G-MD5CQ7MDP5"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

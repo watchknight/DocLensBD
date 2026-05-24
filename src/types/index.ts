@@ -11,6 +11,7 @@ export interface Product {
   color: string;
   gender: 'men' | 'women' | 'unisex' | 'kids';
   images: string[];
+  tryOnImage?: string;
   description: string;
   features: string[];
   rating: number;

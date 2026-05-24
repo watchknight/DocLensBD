@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -18,12 +18,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminLayout from './components/AdminLayout';
-import AdminDashboard from './pages/Admin/AdminDashboard';
-import ManageProducts from './pages/Admin/ManageProducts';
-import AdminOrders from './pages/Admin/AdminOrders';
-
+import Wishlist from './pages/Wishlist';
 const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -31,7 +26,7 @@ const App: React.FC = () => {
         <WishlistProvider>
           <ToastProvider>
             <Router>
-              <div className="min-h-screen flex flex-col bg-[#FAFBFD]">
+              <div className="min-h-screen flex flex-col bg-white">
                 <ScrollProgress />
                 <Header />
                 <main id="main-content" className="flex-grow">
@@ -46,15 +41,7 @@ const App: React.FC = () => {
                       <Route path="/register" element={<Register />} />
                       <Route path="/about" element={<About />} />
                       <Route path="/contact" element={<Contact />} />
-
-                      {/* Admin Routes - Secured */}
-                      <Route path="/admin" element={<ProtectedRoute requireAdmin={true} />}>
-                        <Route element={<AdminLayout />}>
-                          <Route path="dashboard" element={<AdminDashboard />} />
-                          <Route path="products" element={<ManageProducts />} />
-                          <Route path="orders" element={<AdminOrders />} />
-                        </Route>
-                      </Route>
+                      <Route path="/wishlist" element={<Wishlist />} />
                     </Routes>
                   </PageTransition>
                 </main>
