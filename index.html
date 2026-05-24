@@ -34,6 +34,10 @@
 
     <!-- Preload hero image for LCP -->
     <link rel="preload" as="image" href="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=800" />
+
+    <!-- MediaPipe Scripts (Loaded via CDN to fix Vite build constructor errors) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
   </head>
   <body>
     <!-- Accessibility: Skip to content link -->

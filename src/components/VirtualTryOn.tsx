@@ -1,8 +1,11 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { X, Camera as CameraIcon, AlertCircle } from 'lucide-react';
 import { products } from '../data/products';
-import { FaceMesh, Results } from '@mediapipe/face_mesh';
-import { Camera } from '@mediapipe/camera_utils';
+import type { Results } from '@mediapipe/face_mesh';
+
+// Use window globals for MediaPipe to bypass Vite/Rollup tree-shaking issues in production
+const FaceMesh = (window as any).FaceMesh;
+const Camera = (window as any).Camera;
 
 interface VirtualTryOnProps {
   isOpen: boolean;
